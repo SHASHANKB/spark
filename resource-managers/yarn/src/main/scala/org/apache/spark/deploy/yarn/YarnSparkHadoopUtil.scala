@@ -74,14 +74,6 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     jobCreds.mergeAll(UserGroupInformation.getCurrentUser().getCredentials())
   }
 
-  override def getCurrentUserCredentials(): Credentials = {
-    UserGroupInformation.getCurrentUser().getCredentials()
-  }
-
-  override def addCurrentUserCredentials(creds: Credentials) {
-    UserGroupInformation.getCurrentUser().addCredentials(creds)
-  }
-
   override def addSecretKeyToUserCredentials(key: String, secret: String) {
     val creds = new Credentials()
     creds.addSecretKey(new Text(key), secret.getBytes(UTF_8))
@@ -98,7 +90,7 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     val credentialManager = new YARNHadoopDelegationTokenManager(
       sparkConf,
       hadoopConf,
-      YarnSparkHadoopUtil.get.hadoopFSsToAccess(sparkConf, hadoopConf))
+      conf => YarnSparkHadoopUtil.get.hadoopFSsToAccess(sparkConf, conf))
     credentialUpdater = new CredentialUpdater(sparkConf, hadoopConf, credentialManager)
     credentialUpdater.start()
   }
